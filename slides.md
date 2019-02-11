@@ -48,6 +48,13 @@ Editor setup
 
 See `editor_setup.md` for details about how to further customize your editor.
 
+Resources
+---
+
+- https://hackage.haskell.org - one stop shop for Haskell libraries
+- `#haskell` on Freenode - quirky but generally helpful and friendly crowd
+- https://www.haskell.org/documentation - many free books on Haskell
+
 The language
 ====
 
