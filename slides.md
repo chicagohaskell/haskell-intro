@@ -123,6 +123,8 @@ reverse :: [a] -> [a]
 Type classes
 ----
 
+kinship with _interfaces_ but more general
+
 ```haskell
 -- overload names, like "show"
 formatValue :: Show a => a -> String
@@ -143,11 +145,108 @@ getter = client (Proxy @Api)
 Syntax for writing type classes
 
 ```haskell
-class Overlapping f where
-  overlap :: f a -> f a -> Set a
+class IntRep a where
+  toInt :: a -> Int 
 
-instance Overlapping Set where
-  overlap x y = intersection x y
+instance IntRep Bool where
+  toInt x = if x then 1 else 0
+```
+
+IO
+----
+
+- side effects and values from the outside world are modeled using a special 
+  container `IO`.  
+- `IO` is like `Promise` but lazy.
+- `do` notation is analogous to `async/await`
+
+---
+
+JavaScript version:
+
+```javascript
+async function mediate(params) {
+  x = await getFromApi1(params);
+  await pushToApi2({
+    userAgent: "chicago-haskell",
+    value: x
+  });
+  await saveToDisk({
+    timestamp: Date.now(),
+    params,
+    value: x
+  });
+}
+```
+
+---
+
+```haskell
+getFromApi1 :: Params -> IO Value
+pushToApi2 :: String -> Value -> IO ()
+saveToDisk :: UTCTime -> Params -> Value -> IO ()
+```
+
+```haskell
+-- syntactically like synchronous JS
+-- the types work like Promise
+mediate :: Params -> IO ()
+mediate p = do
+  x <- getFromApi1 p
+  pushToApi2 "chicago-haskell" x
+  t <- getCurrentTime
+  saveToDisk t p x
+```
+
+---
+
+... is syntactic sugar for
+
+```haskell
+-- without do notation
+-- (>>=) :: IO a -> (a -> IO b) -> IO b
+-- >>= is analogous to ".then"
+mediate' p = getFromApi1 p >>= \x ->
+  pushToApi2 "chicago-haskell" x >>
+  getCurrentTime >>= \t ->
+  saveToDisk t p x
+```
+
+   
+
+Control flow
+----
+
+Haskell is declarative but supports sequential computation.  
+
+```haskell
+main = loop 1
+  where
+  loop n = do
+    putStrLn $ "try #" ++ show n
+    firstName <- getLine
+    lastName <- getLine
+    let name = firstName ++ " " ++ lastName
+    putStrLn $ "Is " ++ name ++ " correct?"
+    conf <- getLine
+    if conf == "y" 
+      then putStrLn $ "Hello " ++ name ++ "!"
+      -- control is often handled by recursion
+      else loop (n+1)
+```
+
+---
+
+there are many useful combinators for expressing control flow in the standard library
+
+```haskell
+import Control.Monad (forM, unless)
+main = do
+  nums <- fmap (read @Int) <$> getLine
+  unless (length nums == 0) $ 
+    -- nums.forEach(n => { console.log(`another number ${n}`); });
+    forM nums $ \n ->
+      putStrLn $ "another number: " ++ show n
 ```
 
 Higher kinded types
@@ -248,99 +347,5 @@ Persistent data structures
   ```
 - in the lazy evaluation model, operations on persistent data can be efficient (on average)
 
-IO
-----
 
-- side effects and values from the outside world are modeled using a special 
-  container `IO`.  
-- `IO` is like `Promise` but lazy.
-- `do` notation is analogous to `async/await`
 
----
-
-JavaScript version:
-
-```javascript
-async function mediate(params) {
-  x = await getFromApi1(params);
-  await pushToApi2({
-    userAgent: "chicago-haskell",
-    value: x
-  });
-  await saveToDisk({
-    timestamp: Date.now(),
-    params,
-    value: x
-  });
-}
-```
-
----
-
-```haskell
-getFromApi1 :: Params -> IO Value
-pushToApi2 :: String -> Value -> IO ()
-saveToDisk :: UTCTime -> Params -> Value -> IO ()
-```
-
-```haskell
--- syntactically like synchronous JS
--- the types work like Promise
-mediate :: Params -> IO ()
-mediate p = do
-  x <- getFromApi1 p
-  pushToApi2 "chicago-haskell" x
-  t <- getCurrentTime
-  saveToDisk t p x
-```
-
----
-
-... is syntactic sugar for
-
-```haskell
--- without do notation
--- (>>=) :: IO a -> (a -> IO b) -> IO b
--- >>= is analogous to ".then"
-mediate' p = getFromApi1 p >>= \x ->
-  pushToApi2 "chicago-haskell" x >>
-  getCurrentTime >>= \t ->
-  saveToDisk t p x
-```
-
-   
-
-Control flow
-----
-
-Haskell is declarative but supports sequential computation.  
-
-```haskell
-main = loop 1
-  where
-  loop n = do
-    putStrLn $ "try #" ++ show n
-    firstName <- getLine
-    lastName <- getLine
-    let name = firstName ++ " " ++ lastName
-    putStrLn $ "Is " ++ name ++ " correct?"
-    conf <- getLine
-    if conf == "y" 
-      then putStrLn $ "Hello " ++ name ++ "!"
-      -- control is often handled by recursion
-      else loop (n+1)
-```
-
----
-
-there are many useful combinators for expressing control flow in the standard library
-
-```haskell
-import Control.Monad (forM, unless)
-main = do
-  nums <- fmap (read @Int) <$> getLine
-  unless (length nums == 0) $ 
-    -- nums.forEach(n => { console.log(`another number ${n}`); });
-    forM nums $ \n ->
-      putStrLn $ "another number: " ++ show n
-```
