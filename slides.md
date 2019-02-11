@@ -60,12 +60,25 @@ The language
 +--------------+-------------------------+--------------------+
 | evaluation   | strict                  | lazy               |
 +--------------+-------------------------+--------------------+
+| approach     | imperative              | declarative        |
++--------------+-------------------------+--------------------+
 | memory mgmt  | gc                      | gc                 |
 +--------------+-------------------------+--------------------+
-| typings      | none                    | strong; inferred   |
+
+---
+
++--------------+-------------------------+--------------------+
+|              | JavaScript              | Haskell            |
++==============+=========================+====================+
+| typings      | dynamic                 | strong; inferred   |
 +--------------+-------------------------+--------------------+
 | qa           | exhaustive unit testing | type safety + unit |
 +--------------+-------------------------+--------------------+
+| produces     | scripts                 | native code        |
++--------------+-------------------------+--------------------+
+| syntax       | C family                | Lisp family        |
++--------------+-------------------------+--------------------+
+
 
 ---
 
@@ -118,7 +131,19 @@ reverse :: [a] -> [a]
 ::: incremental
 - we don't look at the list items so who cares what type they are?
 - sometimes called generics
+- adds expressiveness to Haskell
 :::
+
+---
+
+functions with heavy daily use tend to be very polymorphic:
+
+```haskell
+(.) :: (b -> c) -> (a -> b) -> (a -> c)
+flip :: (a -> b -> c) -> (b -> a -> c)
+```
+
+functions like these are _absolutely neccessary_ to do functional programming
 
 Type classes
 ----
@@ -130,7 +155,7 @@ kinship with _interfaces_ but more general
 formatValue :: Show a => a -> String
 formatValue x = "x = " ++ show x
 
--- generate code
+-- composable code generation 
 type Api 
   = "menu" 
   :> Capture "item-id" String 
