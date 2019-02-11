@@ -35,6 +35,12 @@ then
 $ stack upgrade
 ```
 
+You may need to add `$HOME/.local/bin` to your `PATH`:
+
+```shell
+$ export PATH=$HOME/.local/bin:$PATH
+```
+
 ## ghcid
 
 Everybody can use ghcid. It's a fantastic tool that compiles in the terminal.
