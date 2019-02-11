@@ -11,8 +11,8 @@ pandoc --standalone \
   --self-contained \
   --highlight-style tango \
   -f markdown+lhs \
-  -i run/Main.lhs \
-  -o build/Main.html
+  -i haddress-book/Main.lhs \
+  -o build/haddress-book.html
 
 pandoc --standalone \
   -V theme=serif \
