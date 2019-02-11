@@ -54,6 +54,7 @@ Resources
 - https://hackage.haskell.org - one stop shop for Haskell libraries
 - `#haskell` on Freenode - quirky but generally helpful and friendly crowd
 - https://www.haskell.org/documentation - many free books on Haskell
+- https://www.haskell.org/hoogle - search engine for terms by type
 
 The language
 ====
@@ -65,9 +66,9 @@ The language
 +==============+=========================+====================+
 | emphasis     | expressiveness          | correctness        |
 +--------------+-------------------------+--------------------+
-| evaluation   | strict                  | lazy               |
+| evaluation   | eager                   | lazy               |
 +--------------+-------------------------+--------------------+
-| approach     | imperative              | declarative        |
+| paradigm     | imperative              | declarative        |
 +--------------+-------------------------+--------------------+
 | memory mgmt  | gc                      | gc                 |
 +--------------+-------------------------+--------------------+
@@ -275,7 +276,7 @@ there are many useful combinators for expressing control flow in the standard li
 ```haskell
 import Control.Monad (forM, unless)
 main = do
-  nums <- fmap (read @Int) <$> getLine
+  nums <- fmap (read @Int) . words <$> getLine
   unless (length nums == 0) $ 
     -- nums.forEach(n => { console.log(`another number ${n}`); });
     forM nums $ \n ->
@@ -308,7 +309,7 @@ data FancyTree a b
   | Branch (LTree a b) (RTree a b)
 
 data LTree a b = LLeaf a | LBranch (LTree a b) (RTree a b)
-data RTree a b = RLeaf b | RBranch (LTree a b) (Rtree a b)
+data RTree a b = RLeaf b | RBranch (LTree a b) (RTree a b)
 
 exampleTree = 
   (LLeaf "hello" `LBranch` RLeaf 7) `Branch` RLeaf 22
