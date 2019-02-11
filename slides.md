@@ -219,39 +219,6 @@ this allows you to map over the `b` part of an `AssocList a b`
 
 ---
 
-Haskell standardizes some very powerful abstractions
-
-```haskell
-instance Bifunctor LTree where
-  bimap f _ (LLeaf x) = LLeaf $ f x
-  bimap f g (LBranch x y) = LBranch (bimap f g x) (bimap f g y)
-
-instance Bifunctor Rtree where
-  bimap _ g (RLeaf x) = RLeaf $ g x
-  bimap f g (RBranch x y) = RBranch (bimap f g x) (bimap f g y)
-
-instance Bifunctor FancyTree where
-  bimap f g (Leaf x) = Leaf $ bimap f g x
-  bimap f g (Branch x y) = Branch (bimap f g x) (bimap f g y)
-```
-
----
-
-```haskell
-data Tree a = TLeaf a | TBranch (Tree a) (Tree a)
-
--- investment
-simplify :: FancyTree a a -> Tree a
-simplify (Leaf x) = either TLeaf TLeaf x 
-simplify (Branch x y) = TBranch (simplifyL x) (simplifyR y)
-  where
-  simplifyL (LLeaf x) = TLeaf x
-  simplifyL (LBranch x y) = TBranch (simplifyL x) (simplifyR y)
-  
-  simplifyR (RLeaf x) = TLeaf x
-  simplifyR (RBranch x y) = TBranch (simplifyL x) (simplifyR y)
-```
-
 ```haskell
 -- return
 treeShow :: (Show a, Show b) => FancyTree a b -> Tree String
