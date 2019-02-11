@@ -106,6 +106,7 @@ function reverse(xs) {
   for (let x of xs) {
     result.unshift(x);
   }
+  return result;
 }
 ```
 
