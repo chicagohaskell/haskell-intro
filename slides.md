@@ -217,14 +217,6 @@ instance Functor (AssocList a) where
 
 this allows you to map over the `b` part of an `AssocList a b`
 
----
-
-```haskell
--- return
-treeShow :: (Show a, Show b) => FancyTree a b -> Tree String
-treeShow = simplify . bimap show show 
-```
-
 Laziness
 ----
 
