@@ -29,8 +29,13 @@ into interactively constructing a value of type `Command` with the user.
 >   | Quit
 >   deriving (Eq, Show)
 
+Our program state will be the current mapping from names to addresses.
+
+> type State = Map String String
+
 This is the main program body.
 
+> main :: IO ()
 > main =
 >   setupState >>=
 >   maybe
@@ -42,9 +47,11 @@ This is the main program body.
 We use some mutual recursion to implement a control flow where the user can 
 quit with the `Quit` command at any time.
 
+>   mainLoop :: State -> IO ()
 >   mainLoop state = 
 >     getInput >>= maybe (mainLoop state) (handleCommand state)
 >
+>   handleCommand :: State -> Command -> IO ()
 >   handleCommand state cmd = case cmd of
 >     Quit -> return ()
 >
@@ -53,7 +60,7 @@ quit with the `Quit` command at any time.
 >       mainLoop state 
 >
 >     Search str -> 
->       Map.traverseWithKey (testEntry str) state >>
+>       Map.traverseWithKey (visitEntry str) state >>
 >       mainLoop state
 >
 >     Remove name -> 
@@ -64,34 +71,40 @@ quit with the `Quit` command at any time.
 >       let state' = Map.insert name addr state in
 >       saveState state' >> mainLoop state'
 >
->   testEntry str name addr
+>   visitEntry :: String -> String -> String -> IO ()
+>   visitEntry str name addr
 >      | str `isInfixOf` name 
 >      = putStrLn . toString $ (name, addr)
 >
 >      | otherwise
 >      = return ()
 >
+> toString :: (String, String) -> String
 > toString (name, addr) = name ++ " @ " ++ addr
 
 Try to grab the state from `addresses.json`, falling back to empty if it doesn't exist.
 
+> setupState :: IO (Maybe State)
 > setupState = 
 >   doesFileExist dataFile >>=
 >   bool (return . Just $ Map.empty) (Ae.decode <$> BSL.readFile dataFile) 
 
 Save the state.
 
+> saveState :: State -> IO ()
 > saveState = BSL.writeFile dataFile . encode 
 
 
 Here is the code for reading user input.
 
+> getInput :: IO (Maybe Command)
 > getInput = do
 >   putStrLn "\nWhat would you like to do?"
 >   putStrLn "Commands: new, remove, search, list, quit"
 >   getLine >>= parseCommand
 
 
+> parseCommand :: String -> IO (Maybe Command)
 > parseCommand input
 >   | input == "new"
 >   = do
