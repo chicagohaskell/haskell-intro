@@ -2,6 +2,8 @@
 title: Haskell for JavaScript hackers
 ---
 
+https://github.com/chicagohaskell/haskell-intro
+
 Tooling
 ====
 
