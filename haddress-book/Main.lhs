@@ -53,7 +53,9 @@ quit with the `Quit` command at any time.
 >
 >   handleCommand :: State -> Command -> IO ()
 >   handleCommand state cmd = case cmd of
->     Quit -> return ()
+>     -- return :: a -> IO a 
+>     -- like Promise.resolve
+>     Quit -> return () -- no-op
 >
 >     List -> 
 >       Map.traverseWithKey (curry $ putStrLn . toString) state >> 
